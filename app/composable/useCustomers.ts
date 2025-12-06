@@ -7,7 +7,7 @@ export interface Customer {
   phone?: string;
 }
 
-const Nextid = 4;
+let nextid = 4;
 const customers = ref<Customer[]>([
   { id: 1, name: "João Silva", email: "joao@gmail.com", phone: "912345678" },
   {
@@ -22,7 +22,7 @@ const customers = ref<Customer[]>([
 export function useCustomers() {
   const createCustomer = (customer: Omit<Customer, "id">) => {
     const newCustomer: Customer = {
-      id: Nextid + 1,
+      id: nextid++,
       ...customer,
     };
     customers.value.push(newCustomer);
