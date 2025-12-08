@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { HomeIcon, User } from "lucide-vue-next";
-import logo from "~/assets/logo.jpeg";
+import logoImport from "~/assets/logo.jpeg";
 import CustomerCreateModal from "./CustomerCreateModal.vue";
 import { ref } from "vue";
 
@@ -9,6 +9,8 @@ const modalRef = ref<{ openModal: () => void } | null>(null);
 const openCustomerModal = () => {
   modalRef.value?.openModal();
 };
+
+const logo: string = logoImport;
 </script>
 
 <template>
