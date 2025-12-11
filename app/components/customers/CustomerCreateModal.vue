@@ -1,22 +1,21 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useCustomers } from "~/composable/useCustomers";
 import type { Customer } from "../../composable/useCustomers";
 
+const props = defineProps<{ modelValue: boolean }>();
+const emit = defineEmits(["update:modelValue"]);
+
 const { createCustomer } = useCustomers();
 
-const showModal = ref(false);
 const newCustomer = ref<Omit<Customer, "id">>({
   name: "",
   email: "",
   phone: "",
 });
 
-// Funções para abrir e fechar o modal
-const openModal = () => (showModal.value = true);
-const closeModal = () => (showModal.value = false);
+const closeModal = () => emit("update:modelValue", false);
 
-// Função para criar cliente
 const handleSubmit = () => {
   if (!newCustomer.value.name || !newCustomer.value.email) return;
   createCustomer({ ...newCustomer.value });
@@ -24,48 +23,61 @@ const handleSubmit = () => {
   newCustomer.value = { name: "", email: "", phone: "" };
 };
 
-// Permite que o Header chame openModal()
-defineExpose({ openModal });
+const open = ref(props.modelValue);
+watch(
+  () => props.modelValue,
+  (val) => (open.value = val)
+);
+watch(open, (val) => emit("update:modelValue", val));
 </script>
 
 <template>
-  <div
-    v-if="showModal"
-    class="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm"
+  <UModal
+    v-model:open="open"
+    title="Novo Cliente"
+    :dismissible="true"
+    :ui="{ header: 'justify-center', footer: 'justify-end' }"
   >
-    <div class="bg-green-700 p-6 rounded-lg w-96">
-      <h2 class="text-xl mb-4 font-bold text-white text-center">
-        Novo Cliente
-      </h2>
-      <input
-        v-model="newCustomer.name"
-        placeholder="Nome "
-        class="border p-2 w-full mb-2 rounded-2xl focus:outline-none"
-      />
-      <input
-        v-model="newCustomer.email"
-        placeholder="Email"
-        class="border p-2 w-full mb-2 rounded-2xl focus:outline-none"
-      />
-      <input
-        v-model="newCustomer.phone"
-        placeholder="Telefone"
-        class="border p-2 w-full mb-4 rounded-2xl focus:outline-none"
-      />
-      <div class="flex justify-end gap-2">
-        <button
-          @click="closeModal"
-          class="px-4 py-2 bg-gray-800 rounded cursor-pointer hover:bg-gray-500"
-        >
-          Cancelar
-        </button>
-        <button
-          @click="handleSubmit"
-          class="px-4 py-2 bg-green-600 text-white rounded cursor-pointer hover:bg-green-700"
-        >
-          Salvar
-        </button>
+    <template #body>
+      <div class="flex flex-col gap-4 justify-center">
+        <label class="font-bold text-gray-800">Nome</label>
+        <input
+          v-model="newCustomer.name"
+          placeholder="Digite o nome"
+          class="p-2 w-full rounded-2xl border-2 border-gray-300 placeholder:text-gray-400 focus:outline-none focus:border-green-500"
+        />
+
+        <label class="font-bold text-gray-800">Email</label>
+        <input
+          v-model="newCustomer.email"
+          placeholder="Digite o email"
+          class="p-2 w-full rounded-2xl border-2 border-gray-300 placeholder:text-gray-400 focus:outline-none focus:border-green-500"
+        />
+
+        <label class="font-bold text-gray-800">Telefone</label>
+        <input
+          v-model="newCustomer.phone"
+          placeholder="Digite o telefone"
+          class="p-2 w-full rounded-2xl border-2 border-gray-300 placeholder:text-gray-400 focus:outline-none focus:border-green-500"
+        />
       </div>
-    </div>
-  </div>
+    </template>
+
+    <template #footer>
+      <UButton
+        label="Cancelar"
+        color="secondary"
+        variant="outline"
+        class="hover:bg-gray-200 cursor-pointer"
+        @click="closeModal"
+      />
+      <UButton
+        label="Salvar"
+        color="primary"
+        variant="solid"
+        class="hover:bg-green-700 cursor-pointer"
+        @click="handleSubmit"
+      />
+    </template>
+  </UModal>
 </template>

@@ -1,15 +1,12 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import { HomeIcon, User } from "lucide-vue-next";
 import logoImport from "~/assets/logo.jpeg";
-import CustomerCreateModal from "./CustomerCreateModal.vue";
-import { ref } from "vue";
 
-const modalRef = ref<{ openModal: () => void } | null>(null);
+const props = defineProps<{ open: boolean }>();
+const emit = defineEmits(["update:open"]);
 
-const openCustomerModal = () => {
-  modalRef.value?.openModal();
-};
-
+const openModal = () => emit("update:open", true);
 const logo: string = logoImport;
 </script>
 
@@ -34,15 +31,16 @@ const logo: string = logoImport;
 
       <div class="w-px h-6 bg-gray-400"></div>
 
-      <button
-        @click="openCustomerModal"
-        class="flex gap-2 items-center bg-green-400 p-2 shadow-2xl rounded-lg hover:bg-green-500 cursor-pointer"
+      <UButton
+        color="success"
+        variant="solid"
+        size="xl"
+        @click="openModal"
+        class="flex items-center gap-2 cursor-pointer"
       >
         <User class="w-5 h-5 text-white" />
         <span class="text-white">Novo Cliente</span>
-      </button>
+      </UButton>
     </div>
   </header>
-
-  <CustomerCreateModal ref="modalRef" />
 </template>
